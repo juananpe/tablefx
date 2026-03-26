@@ -10,6 +10,7 @@ release.properties
 *.jar
 *.war
 *.ear
+*.log
 
 # IDE
 .idea/
