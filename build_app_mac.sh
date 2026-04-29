@@ -9,8 +9,9 @@
 # PROJECT_VERSION: version used in pom.xml, e.g. 1.0-SNAPSHOT
 # APP_VERSION: the application version, e.g. 1.0.0, shown in "about" dialog
 
-JAVA_VERSION=25
+JAVA_VERSION=21
 MAIN_JAR="tablefx-$PROJECT_VERSION.jar"
+JAVAFX_BASE="target/installer/input/libs"
 
 # Set desired installer type: "dmg", "pkg".
 INSTALLER_TYPE=pkg
@@ -43,6 +44,7 @@ detected_modules=`$JAVA_HOME/bin/jdeps \
   --multi-release ${JAVA_VERSION} \
   --ignore-missing-deps \
   --print-module-deps \
+  --module-path "${JAVAFX_BASE}/javafx-base-21.0.2-mac-aarch64.jar:${JAVAFX_BASE}/javafx-controls-21.0.2-mac-aarch64.jar:${JAVAFX_BASE}/javafx-fxml-21.0.2-mac-aarch64.jar:${JAVAFX_BASE}/javafx-graphics-21.0.2-mac-aarch64.jar" \
   --class-path "target/installer/input/libs/*" \
     target/classes/eus/ehu/TableUI.class`
 echo "detected modules: ${detected_modules}"
@@ -58,9 +60,13 @@ echo "detected modules: ${detected_modules}"
 # This can be reduced to the actually needed locales via a jlink parameter,
 # e.g., --include-locales=en,de.
 #
+# JavaFX modules must be added manually because jdeps --print-module-deps
+# only reports JDK-internal modules. We need javafx.base, javafx.controls,
+# javafx.fxml and javafx.graphics for the JavaFX runtime to work.
+#
 # Don't forget the leading ','!
 
-manual_modules=,jdk.crypto.ec,jdk.localedata
+manual_modules=,jdk.crypto.ec,jdk.localedata,javafx.base,javafx.controls,javafx.fxml,javafx.graphics
 echo "manual modules: ${manual_modules}"
 
 # ------ RUNTIME IMAGE ------------------------------------------------------
@@ -76,6 +82,7 @@ $JAVA_HOME/bin/jlink \
   --no-man-pages  \
   --compress=2  \
   --strip-debug \
+  --module-path "${JAVAFX_BASE}/javafx-base-21.0.2-mac-aarch64.jar:${JAVAFX_BASE}/javafx-controls-21.0.2-mac-aarch64.jar:${JAVAFX_BASE}/javafx-fxml-21.0.2-mac-aarch64.jar:${JAVAFX_BASE}/javafx-graphics-21.0.2-mac-aarch64.jar" \
   --add-modules "${detected_modules}${manual_modules}" \
   --include-locales=en,de \
   --output target/java-runtime
