@@ -22,3 +22,5 @@ release.properties
 
 # macOS
 .DS_Store
+
+temp.txt

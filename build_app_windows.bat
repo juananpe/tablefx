@@ -12,8 +12,8 @@ rem APP_VERSION: the application version, e.g. 1.0.0, shown in "about" dialog
 set JAVA_VERSION=25
 set MAIN_JAR=tablefx-%PROJECT_VERSION%.jar
 
-rem Set desired installer type: "exe" (no tools needed), "msi" (requires WiX Toolset v3), "app-image".
-set INSTALLER_TYPE=exe
+rem Set desired installer type: "app-image", "exe" (may need WiX in JDK 25+), "msi" (requires WiX Toolset v3).
+set INSTALLER_TYPE=app-image
 
 rem ------ SETUP DIRECTORIES AND FILES ----------------------------------------
 rem Remove previously generated java runtime and installers. Copy all required
@@ -58,6 +58,14 @@ rem Don't forget the leading ','!
 set manual_modules=,jdk.crypto.ec,jdk.localedata
 echo manual modules: %manual_modules%
 
+rem ------ JAVAFX MODULES -----------------------------------------------------
+rem JavaFX modules are not JDK modules and must be explicitly added to the
+rem runtime image via --module-path pointing to the JavaFX JAR files.
+
+set JAVAFX_MODULE_PATH=target/installer/input/libs/javafx-controls-21.0.2-win.jar;target/installer/input/libs/javafx-fxml-21.0.2-win.jar;target/installer/input/libs/javafx-graphics-21.0.2-win.jar;target/installer/input/libs/javafx-base-21.0.2-win.jar
+set JAVAFX_MODULES=,javafx.base,javafx.controls,javafx.fxml,javafx.graphics
+echo javafx modules: %JAVAFX_MODULES%
+
 rem ------ RUNTIME IMAGE ------------------------------------------------------
 rem Use the jlink tool to create a runtime image for our application. We are
 rem doing this in a separate step instead of letting jlink do the work as part
@@ -70,9 +78,9 @@ call "%JAVA_HOME%\bin\jlink" ^
   --strip-native-commands ^
   --no-header-files ^
   --no-man-pages ^
-  --compress=2 ^
   --strip-debug ^
-  --add-modules %detected_modules%%manual_modules% ^
+  --module-path "%JAVAFX_MODULE_PATH%" ^
+  --add-modules %detected_modules%%manual_modules%%JAVAFX_MODULES% ^
   --include-locales=en,de ^
   --output target/java-runtime
 
@@ -92,8 +100,4 @@ call "%JAVA_HOME%\bin\jpackage" ^
   --icon src/main/logo/windows/duke.ico ^
   --app-version %APP_VERSION% ^
   --vendor "Euskal Herriko Unibertsitatea" ^
-  --copyright "Copyright © 2026 Euskal Herriko Unibertsitatea" ^
-  --win-dir-chooser ^
-  --win-shortcut ^
-  --win-per-user-install ^
-  --win-menu
+  --copyright "Copyright © 2026 Euskal Herriko Unibertsitatea"
