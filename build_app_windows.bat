@@ -9,7 +9,7 @@ rem
 rem PROJECT_VERSION: version used in pom.xml, e.g. 1.0-SNAPSHOT
 rem APP_VERSION: the application version, e.g. 1.0.0, shown in "about" dialog
 
-set JAVA_VERSION=25
+set JAVA_VERSION=21
 set MAIN_JAR=tablefx-%PROJECT_VERSION%.jar
 
 rem Set desired installer type: "exe" (requires WiX Toolset v3 on PATH), "msi" (requires WiX Toolset v3), "app-image".
@@ -36,6 +36,7 @@ echo detecting required modules
   -q ^
   --multi-release %JAVA_VERSION% ^
   --ignore-missing-deps ^
+  --module-path "%JAVAFX_MODULE_PATH%" ^
   --class-path "target\installer\input\libs\*" ^
   --print-module-deps target\classes\eus\ehu\TableUI.class > temp.txt
 

@@ -1,0 +1,30 @@
+# Builds the Windows native installer (EXE + MSI) on push to main.
+# MSI requires WiX Toolset v3 to be installed on the runner.
+name: Windows Client
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven (includes native installer)
+        run: mvn -B install --file pom.xml
+
+      - name: Upload Installer files
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installers
+          path: target\installer\*
