@@ -4,22 +4,54 @@ This guide explains how to build the TableFX Windows `.exe` installer.
 
 ## Prerequisites
 
-### 1. JDK 25
+### 1. JDK 21 or later
 
-Download and install [JDK 25](https://jdk.java.net/25/) (or later).  
-Set the `JAVA_HOME` environment variable system-wide or per-session:
+**Check if already installed:**
+
+```powershell
+java --version
+# Should print something like: openjdk 21.0.x 2024-xx-xx
+#                              or: openjdk 25.0.2 2026-xx-xx
+```
+
+Also verify `JAVA_HOME` is set:
+
+```powershell
+$env:JAVA_HOME
+# Should print the JDK path, e.g. C:\Users\juanan\se1\jdk-25.0.2
+# If blank, set it (see below).
+```
+
+> If `java` is not recognized, check `C:\Program Files\`, `C:\Program Files (x86)\`, or common locations like `C:\Users\<name>\se1\`.  
+> The project compiles with `--release 21` so any JDK 21–25 works.
+
+**If missing — install:**
+
+Download and install [JDK 21+](https://jdk.java.net/21/) or [JDK 25](https://jdk.java.net/25/).  
+Set the `JAVA_HOME` environment variable:
 
 ```powershell
 # System-wide (admin PowerShell):
-[Environment]::SetEnvironmentVariable("JAVA_HOME", "C:\path\to\jdk-25", "Machine")
+[Environment]::SetEnvironmentVariable("JAVA_HOME", "C:\path\to\jdk-21", "Machine")
 
 # Per-session:
-$env:JAVA_HOME = "C:\path\to\jdk-25"
+$env:JAVA_HOME = "C:\path\to\jdk-21"
 ```
+
+> **Note:** The build script sets `JAVA_VERSION=25` for `jdeps --multi-release`. If you use JDK 21, edit `build_app_windows.bat` and change `set JAVA_VERSION=25` to `set JAVA_VERSION=21` (or your JDK major version).
 
 ### 2. Maven
 
-Install Maven to build the project JAR and manage dependencies.
+**Check if already installed:**
+
+```powershell
+mvn --version
+# Should print: Apache Maven x.x.x  ...  Java version: 21.x.x (or 25.x.x)
+```
+
+If you see a version and it shows the correct Java version under "Java version", you're all set.
+
+**If missing — install:**
 
 ```powershell
 # Via Chocolatey:
@@ -29,16 +61,21 @@ choco install maven -y
 # and add its bin\ folder to your PATH.
 ```
 
-Verify:
-```powershell
-mvn --version
-# Should show Java 25 and Maven home
-```
+Verify again with `mvn --version`.
 
 ### 3. WiX Toolset v3
 
-Required by `jpackage --type exe` to produce the `.exe` installer.  
-Install from an **administrator** PowerShell:
+**Check if already installed:**
+
+```powershell
+light.exe -?
+# Should print: Windows Installer XML Toolset Linker version 3.x.x
+# If not recognized, WiX is missing or not on PATH.
+```
+
+Common install location: `C:\Program Files (x86)\WiX Toolset v3.14\bin\`
+
+**If missing — install** from an **administrator** PowerShell:
 
 ```powershell
 # Via Chocolatey (admin shell):
