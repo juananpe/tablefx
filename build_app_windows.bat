@@ -12,8 +12,8 @@ rem APP_VERSION: the application version, e.g. 1.0.0, shown in "about" dialog
 set JAVA_VERSION=25
 set MAIN_JAR=tablefx-%PROJECT_VERSION%.jar
 
-rem Set desired installer type: "app-image", "exe" (may need WiX in JDK 25+), "msi" (requires WiX Toolset v3).
-set INSTALLER_TYPE=app-image
+rem Set desired installer type: "exe" (requires WiX Toolset v3 on PATH), "msi" (requires WiX Toolset v3), "app-image".
+set INSTALLER_TYPE=exe
 
 rem ------ SETUP DIRECTORIES AND FILES ----------------------------------------
 rem Remove previously generated java runtime and installers. Copy all required
@@ -100,4 +100,8 @@ call "%JAVA_HOME%\bin\jpackage" ^
   --icon src/main/logo/windows/duke.ico ^
   --app-version %APP_VERSION% ^
   --vendor "Euskal Herriko Unibertsitatea" ^
-  --copyright "Copyright © 2026 Euskal Herriko Unibertsitatea"
+  --copyright "Copyright © 2026 Euskal Herriko Unibertsitatea" ^
+  --win-dir-chooser ^
+  --win-shortcut ^
+  --win-per-user-install ^
+  --win-menu
